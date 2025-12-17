@@ -1,3 +1,7 @@
 undetected-chromedriver
 selenium
 tqdm
+playwright
+pyperclip
+openai
+aiohttp

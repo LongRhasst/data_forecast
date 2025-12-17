@@ -15,7 +15,7 @@ logging.basicConfig(
 )
 
 async def run_batch_scraping():
-    """Chạy thu thập dữ liệu hàng loạt theo keywords"""
+    """Chạy thu thập dữ liệu hàng loạt theo keywords dạng brand+type"""
     
     # Đọc file keywords
     keywords_file = Path(__file__).parent / 'search_keywork.json'
@@ -24,30 +24,64 @@ async def run_batch_scraping():
     
     # Cấu hình cho từng nhóm
     configs = {
-        'phone': {'max_products': 50, 'sleep': 30},
-        'clothing': {'max_products': 50, 'sleep': 30},
-        'motorcycle': {'max_products': 10, 'sleep': 30},
-        'laptop': {'max_products': 10, 'sleep': 30}
+        'phone': {'max_products': 50, 'sleep': 5},
+        'accessory': {'max_products': 30, 'sleep': 5},
+        'clothing': {'max_products': 50, 'sleep': 5},
+        'laptop': {'max_products': 30, 'sleep': 5}
     }
     
     all_keywords = []
     
-    # Parse keywords
+    # Parse keywords theo cấu trúc brand+type
     for item in keywords_data:
-        # Phone keywords
+        # Phone keywords: brand + type
         if 'phone' in item:
-            for keyword in item['phone']:
+            brands = item['phone'].get('brands', [])
+            types = item['phone'].get('types', [])
+            
+            # Tạo tổ hợp brand + type
+            for brand in brands:
+                for phone_type in types:
+                    keyword = f"{brand} {phone_type}"
+                    all_keywords.append({
+                        'keyword': keyword,
+                        'category': 'phone',
+                        'max_products': configs['phone']['max_products'],
+                        'sleep': configs['phone']['sleep']
+                    })
+        
+        # Accessory keywords: chỉ có types
+        if 'accessory' in item:
+            types = item['accessory'].get('types', [])
+            for acc_type in types:
                 all_keywords.append({
-                    'keyword': keyword,
-                    'category': 'phone',
-                    'max_products': configs['phone']['max_products'],
-                    'sleep': configs['phone']['sleep']
+                    'keyword': acc_type,
+                    'category': 'accessory',
+                    'max_products': configs['accessory']['max_products'],
+                    'sleep': configs['accessory']['sleep']
                 })
         
-        # Clothing keywords
+        # Clothing keywords: sex + type (+ material optional)
         if 'clothing' in item:
-            for category, keywords in item['clothing'].items():
-                for keyword in keywords:
+            sexes = item['clothing'].get('sex', [])
+            types = item['clothing'].get('types', [])
+            materials = item['clothing'].get('materials', [])
+            
+            # Tạo tổ hợp sex + type
+            for sex in sexes:
+                for cloth_type in types:
+                    keyword = f"{cloth_type} {sex}"  # vd: "áo male", "quần female"
+                    all_keywords.append({
+                        'keyword': keyword,
+                        'category': 'clothing',
+                        'max_products': configs['clothing']['max_products'],
+                        'sleep': configs['clothing']['sleep']
+                    })
+            
+            # Thêm material combinations (optional)
+            for material in materials:
+                for cloth_type in types:
+                    keyword = f"{cloth_type} {material}"  # vd: "áo cotton", "quần jeans"
                     all_keywords.append({
                         'keyword': keyword,
                         'category': 'clothing',
@@ -55,21 +89,27 @@ async def run_batch_scraping():
                         'sleep': configs['clothing']['sleep']
                     })
         
-        # Motorcycle keywords
-        if 'motorcycle' in item:
-            for keyword in item['motorcycle']:
-                all_keywords.append({
-                    'keyword': keyword,
-                    'category': 'motorcycle',
-                    'max_products': configs['motorcycle']['max_products'],
-                    'sleep': configs['motorcycle']['sleep']
-                })
-        
-        # Laptop keywords
+        # Laptop keywords: brand + type
         if 'laptop' in item:
-            for keyword in item['laptop']:
+            brands = item['laptop'].get('brands', [])
+            types = item['laptop'].get('types', [])
+            assessories = item['laptop'].get('assessories', [])
+            
+            # Tạo tổ hợp brand + type
+            for brand in brands:
+                for laptop_type in types:
+                    keyword = f"{brand} {laptop_type}"
+                    all_keywords.append({
+                        'keyword': keyword,
+                        'category': 'laptop',
+                        'max_products': configs['laptop']['max_products'],
+                        'sleep': configs['laptop']['sleep']
+                    })
+            
+            # Thêm accessories
+            for accessory in assessories:
                 all_keywords.append({
-                    'keyword': keyword,
+                    'keyword': f"laptop {accessory}",
                     'category': 'laptop',
                     'max_products': configs['laptop']['max_products'],
                     'sleep': configs['laptop']['sleep']
@@ -77,12 +117,21 @@ async def run_batch_scraping():
     
     logging.info(f"🚀 Bắt đầu thu thập dữ liệu cho {len(all_keywords)} keywords")
     logging.info(f"📊 Tổng quan:")
-    logging.info(f"   - Phone: {len([k for k in all_keywords if k['category'] == 'phone'])} keywords x 50 sản phẩm")
-    logging.info(f"   - Clothing: {len([k for k in all_keywords if k['category'] == 'clothing'])} keywords x 50 sản phẩm")
-    logging.info(f"   - Motorcycle: {len([k for k in all_keywords if k['category'] == 'motorcycle'])} keywords x 10 sản phẩm")
-    logging.info(f"   - Laptop: {len([k for k in all_keywords if k['category'] == 'laptop'])} keywords x 10 sản phẩm")
+    logging.info(f"   - Phone: {len([k for k in all_keywords if k['category'] == 'phone'])} keywords x {configs['phone']['max_products']} sản phẩm")
+    logging.info(f"   - Accessory: {len([k for k in all_keywords if k['category'] == 'accessory'])} keywords x {configs['accessory']['max_products']} sản phẩm")
+    logging.info(f"   - Clothing: {len([k for k in all_keywords if k['category'] == 'clothing'])} keywords x {configs['clothing']['max_products']} sản phẩm")
+    logging.info(f"   - Laptop: {len([k for k in all_keywords if k['category'] == 'laptop'])} keywords x {configs['laptop']['max_products']} sản phẩm")
+    
+    # In ra một số ví dụ keywords để kiểm tra
+    logging.info(f"\n📝 Ví dụ keywords sẽ scrape:")
+    for category in ['phone', 'accessory', 'clothing', 'laptop']:
+        category_keywords = [k['keyword'] for k in all_keywords if k['category'] == category][:3]
+        if category_keywords:
+            logging.info(f"   - {category}: {', '.join(category_keywords)}")
     
     # Chạy scraping cho từng keyword
+    all_products = []
+    
     for idx, kw_info in enumerate(all_keywords, 1):
         keyword = kw_info['keyword']
         category = kw_info['category']
@@ -105,9 +154,16 @@ async def run_batch_scraping():
             )
             
             # Chạy scraper
-            await scraper.scrape()
+            products = await scraper.scrape()
             
-            logging.info(f"✅ Hoàn thành thu thập cho '{keyword}'")
+            # Thêm metadata cho mỗi sản phẩm
+            if products:
+                for product in products:
+                    product['search_keyword'] = keyword
+                    product['search_category'] = category
+                all_products.extend(products)
+            
+            logging.info(f"✅ Hoàn thành thu thập cho '{keyword}' - Thu được {len(products) if products else 0} sản phẩm")
             
         except Exception as e:
             logging.error(f"❌ Lỗi khi thu thập '{keyword}': {e}")
@@ -116,11 +172,13 @@ async def run_batch_scraping():
         # Sleep giữa các request
         if idx < len(all_keywords):
             logging.info(f"⏳ Đang chờ {sleep_time} giây trước khi thu thập keyword tiếp theo...")
-            await asyncio.sleep(sleep_time)
     
     logging.info(f"\n{'='*80}")
     logging.info(f"🎉 HOÀN THÀNH! Đã thu thập xong {len(all_keywords)} keywords")
+    logging.info(f"📊 Tổng số sản phẩm: {len(all_products)}")
     logging.info(f"{'='*80}")
+    
+    return all_products
 
 if __name__ == "__main__":
     asyncio.run(run_batch_scraping())

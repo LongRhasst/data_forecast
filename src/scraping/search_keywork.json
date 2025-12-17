@@ -1,22 +1,25 @@
 [
     {
-        "phone" : ["iphone", "samsung", "oneplus", "xiaomi", "nokia", "motorola", "huawei", "oppo", "vivo", "realme", "asus"],
-        "accessory": ["phone case", "screen protector", "charger", "earphones", "power bank", "phone holder", "bluetooth headset", "selfie stick", "car mount", "wireless charger"]
-    },
-    {
-        "clothing": {
-            "áo" : ["áo thun", "áo sơ mi", "áo khoác", "áo len", "áo hoodie", "áo vest", "áo ba lỗ", "áo polo", "áo crop top", "áo dài"],
-            "quần" : ["quần jean", "quần tây", "quần short", "quần legging", "quần jogger", "quần kaki", "quần ống rộng", "quần culottes", "quần thể thao", "quần baggy"],
-            "váy" : ["váy ngắn", "váy dài", "váy xòe", "váy ôm", "váy yếm", "váy maxi", "váy midi", "váy công sở", "váy dạ hội", "váy hoa"],
-            "đầm" : ["đầm dự tiệc", "đầm công sở", "đầm maxi", "đầm body", "đầm suông", "đầm xòe", "đầm dạ hội", "đầm hoa", "đầm ren", "đầm voan"]
+        "phone" : {
+            "brands": ["samsung", "iphone", "xiaomi", "oppo", "vivo", "realme"],
+            "types": ["điện thoại giá rẻ", "Điện thoại tầm trung" ,"điện thoại cao cấp"]
+        },
+        "accessory": {
+            "types": ["ốp lưng", "miếng dán màn hình", "sạc dự phòng", "tai nghe", "cáp sạc"]
         }
     },
     {
-        "motorcycle": ["honda", "yamaha", "suzuki", "ducati", "kawasaki", "bmw", "harley davidson", "aprilia", "triumph", "ktm"],
-        "accessory": ["helmet", "gloves", "riding jacket", "motorcycle boots", "saddlebags", "motorcycle cover", "windshield", "tank bag", "crash bars", "gps mount"]
+        "clothing": {
+            "sex": ["male", "female"],
+            "types": ["áo", "quần", "váy", "đầm", "giày dép", "mũ", "khăn"],
+            "materials": ["cotton", "jeans", "da", "len"]
+        }
     },
     {
-        "laptop": ["dell", "hp", "lenovo", "asus", "acer", "apple macbook", "msi", "razer", "samsung", "microsoft surface"],
-        "accessory": ["laptop bag", "mouse", "keyboard", "laptop stand", "cooling pad", "external hard drive", "usb hub", "webcam", "headset", "docking station"]
+        "laptop": {
+            "brands": ["dell", "hp", "lenovo", "asus", "acer", "apple"],
+            "types": ["laptop gaming", "laptop văn phòng", "laptop đồ họa"],
+            "assessories": ["chuột", "bàn phím", "túi chống sốc", "ram 8-16gb", "ssd 512Gb - 1Tb"]
+        }
     }
 ]
